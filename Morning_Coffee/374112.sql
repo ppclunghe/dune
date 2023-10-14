@@ -1,6 +1,8 @@
 --Name: Curve ETH/stETH
 --Description: Dune SQL
 --Parameters: []
+/* This query calculates daily balance and TVL of Curve ETH/stETH pool, reserves of tokens and price rate  */
+
 with dates as (
     with day_seq as (select (sequence(cast('2021-01-05' as timestamp), cast(now() as timestamp), interval '1' day)) as day)
 select days.day

@@ -1,23 +1,25 @@
 --Name: Reserves of tokens paired to (w)stETH in liquidity pools
 --Description: 
 --Parameters: []
+/* This query returns the current reserves of tokens paired to (w)stETH in USD, 
+reserves changes with frequencies 1d/7d in percentages */
 with 
 
  d7ago_liquiidity as (
 select sum(paired_token_usd_reserve) as paired_token_usd_reserve
-from lido.liquidity  l  --query_2780390
+from lido.liquidity  l  
 where l.time = (select max(time) - interval '7' day  from lido.liquidity)
 )
 
 , d1ago_liquiidity as (
 select sum(paired_token_usd_reserve) as paired_token_usd_reserve
-from lido.liquidity  l  --query_2780390
+from lido.liquidity  l  
 where l.time = (select max(time) - interval '1' day  from lido.liquidity)
 )
 
 , current_liquiidity as (
 select sum(paired_token_usd_reserve) as paired_token_usd_reserve
-from  lido.liquidity  l  --query_2780390
+from  lido.liquidity  l  
 where l.time = current_date 
 )
 

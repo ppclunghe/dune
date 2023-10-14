@@ -1,9 +1,10 @@
 --Name: (w)stETH locked by protocol, Ethereum
 --Description: 
 --Parameters: []
--- last update 2023-09-15
+/* This query returns the amount of (w)stETH locked by protocol
+*/
 
- with not_address_list AS ( --from query steth holders without curve
+ with not_address_list AS ( 
 SELECT
     0x0000000000000000000000000000000000000000 AS address
 union 
@@ -49,7 +50,7 @@ AND  to  NOT IN (SELECT address FROM not_address_list)
         , COALESCE(b.namespace, c.namespace) as namespace
         , COALESCE(NULLIF(b.namespace,''),'depositor')
     FROM (SELECT DISTINCT(address) AS address FROM transfers) a
-    LEFT JOIN (select * from query_2415558 where blockchain = 'ethereum') b ON a.address = b.address
+    LEFT JOIN (select * from query_2415558 where blockchain = 'ethereum') b ON a.address = b.address --LSTs holders list
     LEFT JOIN ethereum.contracts c ON a.address = c.address 
 
 

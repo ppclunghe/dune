@@ -1,6 +1,10 @@
 --Name: (w)stETH 7d trading volume dynamics
 --Description: 
 --Parameters: []
+/* This query calculates the (w)steth trading volume in USD for last 7d 
+and 7-day moving average in USD
+*/
+
 with hours as (
   with hour_seq as(
   SELECT(sequence(cast(date_trunc('hour', now() - interval '360' hour) as timestamp), cast(date_trunc('hour',now()) as timestamp), interval '1' hour)) hour 

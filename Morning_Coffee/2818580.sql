@@ -1,11 +1,14 @@
 --Name: ETH net deposits 7d period, outflow leaders
 --Description: Top-5 projects by net deposits outflow
 --Parameters: []
+/* This query calculates deposits/withdrawals and growth by projects,
+and returns Top 5 projects by net deposits outflow for the last 7d*/
+
 with 
     addresses_list as (
     
-        select address, name from query_2005642
-        --from query_1898794 
+        select address, name from query_2005642 -- ETH depositors labels
+
     )
     
 , alldeposits as (
@@ -35,7 +38,7 @@ group by 1
     select 
     project,
     withdrawn_principal as amount
-    from  dune.lido.result_withdrawals_transactions_assigned_to_projects --query_1038304
+    from  dune.lido.result_withdrawals_transactions_assigned_to_projects 
     where date_trunc('day', time) >= now() - interval '7' day
     and withdrawn_principal > 0
 )

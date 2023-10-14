@@ -1,6 +1,9 @@
---Name: unstETH NFT finalizing time 
+--Name: unstETH NFT finalizing time
 --Description: 
 --Parameters: []
+/* This query calculates the median and average time to complete withdrawal process
+for last 7 days */
+
 with finalized_ids as (
 select min("from") as min_id, max("to") as max_id
 from lido_ethereum.WithdrawalQueueERC721_evt_WithdrawalsFinalized

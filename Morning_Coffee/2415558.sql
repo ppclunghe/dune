@@ -1,7 +1,10 @@
 --Name: LSTs Holders
 --Description: 
 --Parameters: []
--- last update 2023-09-20
+/* This query returns list of stAssets holders addresses by name (namespace), category and blockchain
+*/
+ 
+
      SELECT * 
      FROM (
             values (0x1982b2F5814301d4e9a8b0201555376e62F82428, 'aave_v2', 'lending', 'ethereum')
@@ -209,7 +212,7 @@
 		    , (0x4028daac072e492d34a3afdbef0ba7e35d8b55c4, 'uniswap_v2', 'liquidity_pool', 'ethereum')	
 		    , (0x6abfd6139c7c3cc270ee2ce132e309f59caaf6a2, 'morpho', 'yield', 'ethereum') --lending pool optimazer
 		    , (0x463f9ed5e11764eb9029762011a03643603ad879, 'pods_finance', 'yield', 'ethereum') 	
-		    , (0x519b70055af55a007110b4ff99b0ea33071c720a, 'dxDAO', '?strategy', 'ethereum') --https://daotimes.com/what-is-dxdao-and-how-does-it-work/
+		    , (0x519b70055af55a007110b4ff99b0ea33071c720a, 'dxDAO', '?yield', 'ethereum') --https://daotimes.com/what-is-dxdao-and-how-does-it-work/
 		    , (0x7aD2c85E3092A3876a0b4b345dF8C72FC6c9636f, 'argent', 'proxy', 'ethereum')	
 		    , (0xa978d807614c3bfb0f90bc282019b2898c617880, 'inverse_finance(Anchor)', 'lending', 'ethereum')
             , (0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0, 'lido:wsteth', 'lido:token', 'ethereum')
@@ -313,7 +316,7 @@
 		    --, (0x310a2c115d3d45a89b59640fff859be0f54a08e2, 'maker', 'lending', 'ethereum')
 		    , (0xd19e46692b687ff54c941cd0e0e2883259c7e01e, 'instadapp', 'defi_aggr', 'ethereum')
 		    , (0xef0881ec094552b2e128cf945ef17a6752b4ec5d, 'sushiSwap', 'liquidity_pool', 'ethereum')
-		    , (0x82e90eb7034c1df646bd06afb9e67281aab5ed28, 'mai_finance', 'strategy', 'ethereum' )--nft
+		    , (0x82e90eb7034c1df646bd06afb9e67281aab5ed28, 'mai_finance', 'yield', 'ethereum' )--nft
 		    --, (0xc38d57e5e4e74ea1cb8b6cd93791ddd5493affe5, 'maker', 'lending', 'ethereum')
 		    , (0x60ee8465dc43245c6c2989b1089e476d3a0a717d, 'instadapp', 'defi_aggr', 'ethereum')
 		    , (0x651361a042e0573295dd7f6a84dbd1da56dac9d5, 'balancer_v2', 'gauge', 'ethereum')
@@ -345,7 +348,7 @@
 		    , (0x37fec7b2f36f3bbae956262f46ddf21830fa68ef, 'pendle', 'yield', 'ethereum')
 		    , (0x1ed5b46a8c708425308bcf3239ff1a57e7cacd09, 'gnosis_safe', 'multisig', 'ethereum')
 		    , (0xcd4722b7c24c29e0413bdcd9e51404b4539d14ae, 'balancer_v2', 'gauge', 'ethereum')
-		    , (0x64a53b849072a4d778cec579396e279f299b0bec, 'cian', 'strategy', 'ethereum')-- frst txn came from 0xec55E7cfebBE4f878E9dD998d3a038458AC3197D cian strategy pool
+		    , (0x64a53b849072a4d778cec579396e279f299b0bec, 'cian', 'yield', 'ethereum')-- frst txn came from 0xec55E7cfebBE4f878E9dD998d3a038458AC3197D cian strategy pool
 		    --, (0x2f606b9562e313f93891956b08be8aca3a750d9d, 'maker', 'lending', 'ethereum')
 		    , (0x989aeb4d175e16225e39e87d0d97a3360524ad80, 'convex', 'yield', 'ethereum')
 		    , (0xf3abc972a0f537c1119c990d422463b93227cd83, 'pendle', 'yield', 'ethereum')
@@ -421,8 +424,8 @@
 		    , (0x133dadace975ba195e3940bbf30f6f80ba90d5fb, 'gnosis_safe', 'multisig', 'ethereum')
 		    , (0xea8d287e23f1e005fa8bd3c9d1efae2c726db9a4, 'proxy', 'multisig', 'ethereum')
 		    ----2023-09-29---
-		    , (0x225d3822De44E58eE935440E0c0B829C4232086e, '1inch', 'strategy', 'ethereum') --team investment fund
-		    , (0x720D8790666bd40B9CA289CBe73cb1334f0aE7e3, '?1inch', 'multisig', 'ethereum') -- seems to be affiliated with 1inch foundation 
+		    , (0x225d3822De44E58eE935440E0c0B829C4232086e, '1inch', 'multisig', 'ethereum') --team investment fund
+		    , (0x720D8790666bd40B9CA289CBe73cb1334f0aE7e3, '1inch', 'multisig', 'ethereum') -- seems to be affiliated with 1inch foundation 
 		    
     )x (address, namespace, category, blockchain)
     --------wsteth holders------------
@@ -438,7 +441,7 @@
             , (0xc5f2cf5C4C874C296281e2A73a2E44C9FBA55741, 'ribbon_v2', 'yield', 'ethereum') 
             , (0xbfD291DA8A403DAAF7e5E9DC1ec0aCEaCd4848B9, 'dforce', 'lending', 'ethereum') --TransparentUpgradeableProxy
             , (0x06a0CCFb89E9B2814afCA6637C22ed83909739Ee, 'spirals', 'yield', 'ethereum') --green.eth
-            , (0xE76Ffee8722c21b390eebe71b67D95602f58237F, 'unsh.eth', 'strategy', 'ethereum') -- LSDVault 
+            , (0xE76Ffee8722c21b390eebe71b67D95602f58237F, 'unsh.eth', 'yield', 'ethereum') -- LSDVault 
             , (0x44afd57daf3fd5294c5d09465d368cef5ed1f83e, 'argent', 'proxy', 'ethereum') --Proxy
             , (0x22799bd5769cf44b8de4adedcd899f14ea89f20d, 'argent', 'proxy', 'ethereum') 
             , (0xcd91538b91b4ba7797d39a2f66e63810b50a33d0, 'arcx', '?yield', 'ethereum')
@@ -481,7 +484,7 @@
 		    , (0xbc33a1f908612640f2849b56b67a4de4d179c151, 'kyber_multisig', 'multisig', 'ethereum')--contract MultiSigWalletWithDailyLimit
 		    , (0x0eb1c92f9f5ec9d817968afddb4b46c564cdedbe, 'maverick', 'liquidity_pool', 'ethereum')--?
 		    , (0x2b0024ecee0626e9cfb5f0195f69dcac5b759dc9, 'gravita', 'lending', 'ethereum')
-		    , (0x88ad09518695c6c3712ac10a214be5109a655671, 'gnosis_chain', 'bridge', 'ethereum') --Omni bridge
+		    , (0x88ad09518695c6c3712ac10a214be5109a655671, 'xdai_bridge', 'bridge', 'ethereum') --Omni bridge
 		    , (0x9e240daf92dd0edf903def1ff1dd036ca447aaf7, '?maker', 'lending', 'ethereum') --???
 		    , (0x5d527c9641effeb3802f2ffafdd15a1b95e41c8c, '?maker', 'lending', 'ethereum') --???
 		    , (0x608e1e01ef072c15e5da7235ce793f4d24eca67b, 'unknown6', 'unknown', 'ethereum')-- contract created by eridian.eth erc1967proxy
@@ -648,7 +651,7 @@
             , (0xcfdb0e7b9824633151cCa8982BD721a9a1684F20, 'others', 'others', 'ethereum')
             -----2023-09-20
             , (0x4f64951a6583d56004ff6310834c70d182142a07, 'pancakeswap_v3', 'liquidity_pool', 'ethereum')
-            , (0x9040e41eF5E8b281535a96D9a48aCb8cfaBD9a48, 'across_protocol', '?bridge', 'ethereum')
+            , (0x9040e41eF5E8b281535a96D9a48aCb8cfaBD9a48, 'across_protocol', '?yield', 'ethereum')
             , (0xf20b338752976878754518183873602902360704, 'f2pool', 'others','ethereum' ) --mining, holds sparkwsteth
             , (0x49a8caf0daa83c510f349dd777d05a642ac43494, 'others', 'others', 'ethereum')
             , (0x6f2c9d3658c47e717c2652b884c06b5c2bc2694b, 'others', 'others', 'ethereum')
@@ -657,11 +660,26 @@
              -----------------2023-09-27---------------------------
 		    , (0x3fd49a8f37e2349a29ea701b56f10f03b08f1532, 'unknown7', 'unknown', 'ethereum')--???cian- strategy?
 		    , (0xe84A061897afc2e7fF5FB7e3686717C528617487, 'proxy', 'multisig', 'ethereum')
-		    , (0x482b2150889bfc8cad0548ebb006cfd643647b69, 'others', 'others', 'ethereum')
+		    , (0x482b2150889bfc8cad0548ebb006cfd643647b69, 'others', 'others', 'ethereum') --created by elementix.eth
 		    , (0x574053576d2493cb3aa3a482e6e16ea7bb41c6f8, 'gnosis_safe', 'multisig', 'ethereum')
 		    , (0xfefe3d7c498ca1074a2d12644f827da828302520, 'instadapp', 'defi_aggr', 'ethereum')
 		    , (0x76a523270c95499bcc1fe7061e97a0403e7069e1, 'unknown8', 'unknown', 'ethereum')
-
+		    -----------------2023-10-03---------------------------
+            , (0x05bc11f64c6515bb384b05bfd3e0d0424fa65aa4, 'gnosis_safe', 'multisig', 'ethereum')
+            , (0x3b95bc951ee0f553ba487327278cac44f29715e5, 'manta_pacific', 'bridge', 'ethereum') --small to post, added to bridge widget
+            , (0xe466d6cf6e2c3f3f8345d39633d4a968ec879bd5, 'gnosis_safe', 'multisig', 'ethereum')
+            , (0xb8d6d734d9e327e048cad766b8f5525bd3193a49, 'gnosis_safe', 'multisig', 'ethereum')
+            , (0xd44ea8b0bef5b56c24c7dd83d33415ed04bb7274, 'arrakis_finance', 'liquidity_pool', 'ethereum') -- small balance
+            -----------------2023-10-11---------------------------
+            , (0x7fc386640f349e8f9c683a91b5848b0b2db21bb6, 'gnosis_safe', 'multisig', 'ethereum')
+            , (0x0e119685190ca54b5bbf5e3504f447c5e40d2410, 'gnosis_safe', 'multisig', 'ethereum')
+            , (0xe705b1d26b85c9f9f91a3690079d336295f14f08, 'gnosis_safe', 'multisig', 'ethereum')
+            , (0xa1cca462b4b08f4fad77e8e39ac6615416ccdf39, 'argent', 'proxy', 'ethereum')
+            , (0x6de4dbb57fb1fcd7b2e824caec2785c3d4890728, 'argent', 'proxy', 'ethereum')
+            , (0x8aed8c89e11a05dbb8a5108b8cd4cbc93222fea5, 'others', 'others', 'ethereum')
+            , (0x2f08cebbd27b308cf88d2d0493b7583cd2a5da3e, 'others', 'others', 'ethereum')
+            , (0x1ce8aafb51e79f6bdc0ef2ebd6fd34b00620f6db, 'diva', 'yield', 'ethereum')
+            , (0x1ebfd36223079dc79fefc62260db9e25f3f5e2c7, 'strike', 'lending', 'ethereum')
             
             
             
@@ -697,7 +715,7 @@
             , (0x83106ddcac5d119a3d0f551e06239e579299b7c4, 'mstable', 'yield', 'optimism')
            -- , (0x7ca75bdea9dede97f8b13c6641b768650cb837820002000000000000000000d5 Beethoven
             -- 0x098f32d98d0d64dba199fc1923d3bf4192e787190001000000000000000000d2)
-            , (0x872103ee5d8e1b4e41284355b27b3d20afc3c08a, 'exact.ly', 'strategy', 'optimism') --contract StrategyExactlySupply
+            , (0x872103ee5d8e1b4e41284355b27b3d20afc3c08a, 'exact.ly', 'yield', 'optimism') --contract StrategyExactlySupply
             , (0x881B922822668315867D32f674B3287193A17a6C, 'gnosis_safe', 'proxy', 'optimism')
             , (0x0d9b71891dc86400acc7ead08c80af301ccb3d71, 'gnosis_safe', 'proxy', 'optimism')
             , (0x92a22fb981187e2317b4aa993b18fe4e41851b5f, 'gnosis_safe', 'proxy', 'optimism')
@@ -822,7 +840,7 @@
             , (0xb1e6f8820826491fcc5519f84ff4e2bdbb6e3cad, 'others', 'others', 'arbitrum') --created by Carbon: Deployer
             , (0x2e9ee89099ee816eacb7301bcdb57a6375a1c6e1, 'plutus_dao', 'treasury', 'arbitrum') --!!!
             -- , (0x2e9ee89099ee816eacb7301bcdb57a6375a1c6e1, 'gnosis_safe', 'multisig', 'arbitrum')
-            , (0xb329504622bd79329c6f82cf8c60c807df2090c4, 'cian', 'strategy', 'arbitrum')
+            , (0xb329504622bd79329c6f82cf8c60c807df2090c4, 'cian', 'yield', 'arbitrum')
             , (0x58f046c5374e9cf942b8eeb056126ce86dd63eeb, 'others', 'others', 'arbitrum') --WSTETHSVault
             , (0xdd36915a2657b02ea3e590720dae4c9fa24b6fdd, 'quoda_finance', 'lending', 'arbitrum')--!!!!!!!!
             , (0x0fd7599f94c503bd4b19257d6624db71cea11feb, 'para_space', 'lending', 'arbitrum')

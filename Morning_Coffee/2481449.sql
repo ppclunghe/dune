@@ -1,12 +1,14 @@
 --Name: Lido buffer
 --Description: 
 --Parameters: []
+/*This query calculates amount of ETH in Lido buffer since launch v2*/
+
  --Lido's blocks
 with blocks as (
 select number, blocks.time, blocks.base_fee_per_gas, blocks.gas_used,
 blocks.base_fee_per_gas*blocks.gas_used/1e18 AS total_burn
 from ethereum.blocks
-where miner = 0x388c818ca8b9251b393131c08a736a67ccb19297
+where miner = 0x388c818ca8b9251b393131c08a736a67ccb19297 --EL vault
 
 )
 
@@ -40,17 +42,16 @@ order by block_number desc
 , withdrawals as (
 select block_time as time, sum(amount)/1e9 as amount
 from ethereum.withdrawals
-where address = 0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f
+where address = 0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f --withdrawal vault
 group by 1
 ) 
 --Transfers 
 , transfers as (
 select block_time as time, (-1)*sum(cast(value as double))/1e18 as amount
 from ethereum.traces
-where "from" in  (0xae7ab96520de3a18e5e111b5eaab095312d7fe84,
-                  0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f, --withdrawal vault
-                  --0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1, --withdrawal queue
-                  0x388c818ca8b9251b393131c08a736a67ccb19297) --EL vault
+where "from" in  (0xae7ab96520de3a18e5e111b5eaab095312d7fe84, --stETH
+                  0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f, -- withdrawal vault
+                  0x388c818ca8b9251b393131c08a736a67ccb19297) -- EL vault
  and (LOWER(call_type) not in ('delegatecall', 'callcode', 'staticcall') or call_type is null)
  and tx_success 
  and success 
@@ -60,9 +61,9 @@ union all
                     
 select  block_time as time, sum(cast(value as double))/1e18 
 from ethereum.traces
-where to in  (0xae7ab96520de3a18e5e111b5eaab095312d7fe84,
-              0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f, --withdrawal vault
-              0x388c818ca8b9251b393131c08a736a67ccb19297)
+where to in  (0xae7ab96520de3a18e5e111b5eaab095312d7fe84, -- stETH
+              0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f, -- withdrawal vault
+              0x388c818ca8b9251b393131c08a736a67ccb19297) -- EL vault
  and (LOWER(call_type) not in ('delegatecall', 'callcode', 'staticcall') or call_type is null)
  and tx_success 
  and success 
@@ -72,9 +73,9 @@ union all --gas costs
                     
 select block_time as time, (-1)*sum(cast(gas_price*gas_used as double))/1e18 
 from ethereum.transactions
-where "from" in  (0xae7ab96520de3a18e5e111b5eaab095312d7fe84,
-                  0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f, --withdrawal vault
-                  0x388c818ca8b9251b393131c08a736a67ccb19297)
+where "from" in  (0xae7ab96520de3a18e5e111b5eaab095312d7fe84, -- stETH
+                  0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f, -- withdrawal vault
+                  0x388c818ca8b9251b393131c08a736a67ccb19297) -- EL vault
 group by 1
 )
 

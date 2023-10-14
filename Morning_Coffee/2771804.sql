@@ -1,6 +1,9 @@
 --Name: Top addresses
 --Description: 
 --Parameters: []
+/* This query returns addresses with (w)steth transactions (staked, withdrawn, transferred) 
+with amount more than 10k for the last 24h 
+*/
 --Need to convert wstETH to stETH, update amount 5k -> 10k
 with events as (
 select t."from" as address, sum(amount)/1e18 as staked, 0 as withdrawn, 0 as bought, 0 as sold

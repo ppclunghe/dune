@@ -1,7 +1,9 @@
 --Name: ETH depositors labels
 --Description: 
 --Parameters: []
-
+/* This query returns list of depositors addresses by name (namespace), defining its category and type (Liquid/ Illiquid)
+On the query is built mat veiw
+*/
         with coinbase_main_addresses as --ADDRESSES WE IDENTIFIED EARLIER AS COINBASE
             (
         select 
@@ -77,12 +79,15 @@ SELECT *
         values (0xae7ab96520de3a18e5e111b5eaab095312d7fe84, 'Lido', 'Decentralized', 'Liquid') --staking contract
         ,(0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f, 'Lido', 'Decentralized', 'Liquid') --withdrawals contract
         ,(0xFdDf38947aFB03C621C71b06C9C70bce73f12999, 'Lido', 'Decentralized', 'Liquid') --v2 staking router
+        ,(0xa76a7d0d06754e4fc4941519d1f9d56fd9f8d53b, 'Lido', 'Decentralized', 'Liquid')
         ,(0x4ca21e4d3a86e7399698f88686f5596dbe74adeb, 'P2P', 'Decentralized', 'Illiquid')
+        ,(0x8e76a33f1aFf7EB15DE832810506814aF4789536, 'P2P', 'Decentralized', 'Illiquid')
         , (0x39dc6a99209b5e6b81dc8540c86ff10981ebda29, 'Staked.us', 'Hybrid', 'Illiquid')
         , (0x0194512e77d798e4871973d9cb9d7ddfc0ffd801, 'stakefish', 'Hybrid', 'Illiquid')
         , (0xd4039ecc40aeda0582036437cf3ec02845da4c13, 'Kraken', 'Centralized', 'Illiquid')
         , (0xa40dfee99e1c85dc97fdc594b16a460717838703, 'Kraken', 'Centralized', 'Illiquid')
         , (0x4befa2aa9c305238aa3e0b5d17eb20c045269e9d, 'RockX', 'Hybrid', 'Liquid') --uniETH token, contract 0xF1376bceF0f78459C0Ed0ba5ddce976F1ddF51F4 
+       
         , (0x622de9bb9ff8907414785a633097db438f9a2d86, 'Bitcoin Suisse', 'Centralized', 'Illiquid')
         , (0xdd9663bd979f1ab1bada85e1bc7d7f13cafe71f8, 'Bitcoin Suisse', 'Centralized', 'Illiquid')
         , (0xec70e3c8afe212039c3f6a2df1c798003bf7cfe9, 'Bitcoin Suisse', 'Centralized', 'Illiquid')
@@ -93,6 +98,7 @@ SELECT *
         , (0x06051f7af88694201f74c71c4e25f7f4e35a9779, 'Bitcoin Suisse', 'Centralized', 'Illiquid')
         , (0x8004b4a5795899e4c25c598fbf7d0e7f737ce15a, 'Bitcoin Suisse', 'Centralized', 'Illiquid')
         , (0x4ebf51689228236ec55bcafef9d79663992a7fb6, 'Bitcoin Suisse', 'Centralized', 'Illiquid')
+        , (0x8e3776993f3ec045863ec9e40b511aba867c5d0e, 'Bitcoin Suisse', 'Centralized', 'Illiquid')
         --, (0xf2be95116845252a28bd43661651917dc183dab1, 'Consensys', 'Decentralized', 'Illiquid') --false
         , (0xf2be95116845252a28bd43661651917dc183dab1, 'Figment', 'Centralized', 'Illiquid')
         , (0x37ab162ab59e106d6072eb7a7bd4c4c2973455a7, 'Figment', 'Centralized', 'Illiquid')
@@ -102,6 +108,8 @@ SELECT *
         , (0x84db6ee82b7cf3b47e8f19270abde5718b936670, 'Stkr (Ankr)', 'Decentralized', 'Liquid')
         , (0xd1a72bd052e0d65b7c26d3dd97a98b74acbbb6c5, 'Stader', 'Decentralized', 'Liquid')
         , (0x09134C643A6B95D342BdAf081Fa473338F066572, 'Stader', 'Decentralized', 'Liquid')
+        , (0x8103151e2377e78c04a3d2564e20542680ed3096, 'Node DAO', 'Decentralized', 'Liquid')
+        , (0xa86341e5c278443c8648be44110167e1bbd9cba6, 'Node DAO', 'Decentralized', 'Liquid') --https://doc.nodedao.com/deployed-contracts/mainnet-ethereum
         , (0x194bd70b59491ce1310ea0bceabdb6c23ac9d5b2, 'Huobi', 'Centralized', 'Illiquid')
         , (0xb73f4d4e99f65ec4b16b684e44f81aeca5ba2b7c, 'Huobi', 'Centralized', 'Illiquid')
         , (0xbf1556a7d625654e3d64d1f0466a60a697fac178, 'InfStones','Centralized', 'Illiquid') -- BatchDeposit
@@ -237,15 +245,14 @@ SELECT *
         , (0x21e6ed571226168ec87ef964c33053ce8237d812, 'Unknown whale 38 (old money from Kraken)', 'Whale', 'Individual')
         , (0xee25d3e2bf2ce279eb725d7f9b4b4505bbbe9276, 'Unknown whale 38 (old money from Kraken)', 'Whale', 'Individual')
         , (0x2b982DD19aF6aB6d342eB065d5fbe9F97C5872C5, 'Unknown whale 39 (from Binance)', 'Whale', 'Individual')
-        --, (0x282a9e13ced2e838ac3b423995a9b174a54d6a4b, 'Unknown whale 39 (from Binance)', 'Whale', 'Individual')
         , (0xeabb4d333a5b2202619842bcfb13324d0eb29fdd, 'Unknown whale 40 (from Binance)', 'Whale', 'Individual')
         , (0x4f9aa4052932947bce8105f0d0613751d152f304, 'Unknown whale 41 (from Kraken)', 'Whale', 'Individual')
         , (0x1b63142628311395ceafeea5667e7c9026c862ca, 'Taylor Gerring', 'Whale', 'Individual')
         , (0x2ed8eb76c91fa25b21d588128569dbc2f885e511, 'Linke Yang', 'Whale', 'Individual')
         , (0xf637b10647e2d0fd00c6a0b70d9e85bf6ea0327f, 'Ripio Credit Network', 'Whale', 'Individual') --depositor addres funded from multisig belonging to the p2p lending protocol - 0x16A0772b17AE004E6645E0e95BF50aD69498a34e . Doesn't seems to provide staking services to users
         , (0x25e821b7197B146F7713C3b89B6A4D83516B912d, 'ether.fi' , 'Decentralized', 'Liquid')
-        , (0x1bdc639eabf1c5ebc020bb79e2dd069a8b6fe865, 'Golem Foundation', 'Whale', 'Individual') --https://www.golem.network --0x8731EF92831dF93383f3053B96a7919F14839c1D might belong to them too, same deployed within several days
-        , (0xba1951dF0C0A52af23857c5ab48B4C43A57E7ed1, 'Golem Foundation', 'Whale', 'Individual')
+        , (0x1bdc639eabf1c5ebc020bb79e2dd069a8b6fe865, 'Octant', 'Decentralized', 'Illiquid') --https://www.golem.network --0x8731EF92831dF93383f3053B96a7919F14839c1D might belong to them too, same deployed within several days
+        , (0xba1951dF0C0A52af23857c5ab48B4C43A57E7ed1, 'Octant', 'Decentralized', 'Illiquid')
         ,(0xF17ACEd3c7A8DAA29ebb90Db8D1b6efD8C364a18, 'Binance', 'Centralized', 'Illiquid') 
         ,(0x2f47a1c2db4a3b78cda44eade915c3b19107ddcc, 'Binance', 'Centralized', 'Illiquid')
         ,(0x19184aB45C40c2920B0E0e31413b9434ABD243eD, 'Binance', 'Centralized', 'Illiquid')
@@ -283,6 +290,7 @@ SELECT *
         , (0x7ef5d450be41fcbc6191cb09789c5783da53f3fc, 'Unknown 19', 'Others', 'Illiquid')
         , (0x9351628900df0f0cf7d8864bc035f292d48db001, 'Unknown 20', 'Others', 'Illiquid') --might be connected with Loopring, same wallet interacted with this address and Loopring deployer
         --, (0xcf95237ce34d4b5bf1e7de4474ee1dcc01f24ca9, 'Unknown 20', 'Others', 'Illiquid') idenified as Upbit
+        , (0x1a0ffc5d6a8f14bacfb21056355394128fa6b955, 'DxPool', 'Hybrid', 'Illiquid')
          
         --, ('\'::bytea, '')
         ) 
@@ -334,6 +342,7 @@ SELECT *
         */
         and "from" in (select minipool from rocketpool_ethereum.RocketMinipoolManager_evt_MinipoolCreated)
         group by 1
+        
         
         UNION
 
@@ -390,6 +399,7 @@ SELECT *
                 ,(0x52Fa4FC3c3100c0FFE3630d53a4fE10e73363c08, 'Daniel Wang','Whale' , 'Individual')
                 , (0xa3ae668b6239fa3eb1dc26daabb03f244d0259f0, 'Daniel Wang', 'Whale', 'Individual')
                 , (0x4757d97449aca795510b9f3152c6a9019a3545c3, 'Daniel Wang', 'Whale', 'Individual')
+                , (0x282a9e13ced2e838ac3b423995a9b174a54d6a4b, 'Daniel Wang', 'Whale', 'Individual')
                 )x(project, name,category,liquidity)
 
         UNION
@@ -766,6 +776,28 @@ SELECT *
         )
         group by 1  
 
+    union
+    select 
+            "from" address, 'Unknown whale 42 (from Binance)' AS name
+            ,'Whale' as category, 'Individual' as liquidity  
+        from  ethereum.traces
+        where to = 0x00000000219ab540356cbb839cbe05303d7705fa
+        and block_number >= 11182202
+        and call_type = 'call'
+        and success = True 
+        and "from" in (
+                    select to as project
+                    from ethereum.transactions
+                    where "from" =  0x5b3ECaD8ca171cd3123cC295E28cfE51F4Ad4Abb
+                            and to != 0x00000000219ab540356cbb839cbe05303d7705fa
+                    group by 1
+
+                    union
+                    select  0x5b3ECaD8ca171cd3123cC295E28cfE51F4Ad4Abb as project
+                    )
+    
+    union
+    select * from query_3088763
 )
 
 

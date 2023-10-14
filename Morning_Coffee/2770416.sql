@@ -1,6 +1,8 @@
 --Name: (w)stETH 7d trading volume dynamics (breakdown)
 --Description: 
 --Parameters: []
+/* This query calculates cumulative (w)steth trading volume in USD for last 7d by protocol
+*/
 with dates as (
     with hour_seq as (
             SELECT (

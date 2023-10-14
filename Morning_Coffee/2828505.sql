@@ -1,6 +1,7 @@
 --Name: Tokens prices
 --Description: 
 --Parameters: []
+/* This query returns latest price in USD for ETH, stETH, wstETH and LDO */
 select * from (
 select 1 as numb, price --ETH
 from prices.usd_latest

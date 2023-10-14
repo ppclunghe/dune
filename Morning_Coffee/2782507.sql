@@ -1,6 +1,13 @@
 --Name: Locked in DeFi
 --Description: 
 --Parameters: []
+/* This query calculates:
+- the total amount of stETH locked in DeFi;
+- changes of stETH amount locked in DeFi with frequences 1d/7d
+- current amount of stETH locked in Lending market/ Liquidity pool
+- changes of reserves in Lending market/ Liquidity pool with frequences 1d/7d
+*/
+
 with dates as (
     with day_seq as (select (sequence(current_date - interval '7' day, current_date, interval '1' day)) as day)
 select days.day

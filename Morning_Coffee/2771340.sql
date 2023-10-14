@@ -1,6 +1,9 @@
 --Name: Liquidations last 7 days
 --Description: 
 --Parameters: []
+/*This query calculates the number of liquidations for the last 7 days, 
+their daily amount by protocol with collateral asset */
+
 with reserves(address, symbol) AS (
     select * from (values 
     (0xae7ab96520de3a18e5e111b5eaab095312d7fe84, 'stETH'),

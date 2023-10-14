@@ -1,6 +1,8 @@
---Name: stETH:wstETH rate
+--Name: wstETH:stETH rate
 --Description: 
 --Parameters: []
+/* This query returns current wstETH:stETH rate*/
+
 select time, sum(steth)/sum(wsteth) AS rate
 from 
     (

@@ -1,7 +1,8 @@
 --Name: stETH locked by protocol 1d ago
 --Description: 
 --Parameters: []
--- last update 2023-06-09
+/* This query returns the amount of stETH locked by protocol 1 day ago
+*/
 
  with not_address_list AS ( --from query steth holders without curve
 SELECT

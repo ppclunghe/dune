@@ -1,15 +1,19 @@
 --Name: Lido APR breakdown
 --Description: 
 --Parameters: []
+/* This query returns current value of Lido staking APR, 7-day moving average for Lido staking APR, 
+values of Consensus Layer APR and Execution Layer APR
+*/
+
 with breakdown_apr as (
 select time, CL_APR, EL_APR
-from query_1288160
+from query_1288160 --Lido post Merge APR
 where time >= date_trunc('day', now()) - interval '7' day
 )
 
 , staking_apr as (
 select *
-from query_570874
+from query_570874 -- Lido staking APR 7d MA
 where time >= now() - interval '7' day
 
 )

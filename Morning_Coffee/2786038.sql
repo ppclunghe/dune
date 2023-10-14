@@ -1,6 +1,7 @@
 --Name: Lido BC deposits/withdrawals 7d dynamics
 --Description: 
 --Parameters: []
+/* This query calculates the amount of ETH deposited/withdrawn by Lido with 7d frequency */
 with dates as (
     with day_seq as (
         select (sequence(current_date - interval '7' day, current_date, interval '1' day)) as day)
@@ -11,9 +12,9 @@ with dates as (
  
 , addresses_list(address) as (
     values 
-    (0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f),
-    (0xae7ab96520de3a18e5e111b5eaab095312d7fe84),
-    (0xfddf38947afb03c621c71b06c9c70bce73f12999)
+    (0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f), -- Lido Withrdrawal Vault 
+    (0xae7ab96520de3a18e5e111b5eaab095312d7fe84), -- stETH 
+    (0xfddf38947afb03c621c71b06c9c70bce73f12999) -- Lido Staking Router
     )
     
 , deposits as (
@@ -21,7 +22,7 @@ with dates as (
         date_trunc('day', block_time) as time
         , sum(cast(value as double))/1e18 as amount
     from  ethereum.traces t
-    where to = 0x00000000219ab540356cbb839cbe05303d7705fa
+    where to = 0x00000000219ab540356cbb839cbe05303d7705fa --BC
     and "from" in (select address from addresses_list)
     AND date_trunc('day', block_time) >= now() - interval '7' day
     and call_type = 'call'

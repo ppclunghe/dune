@@ -1,6 +1,8 @@
 --Name: ETH staked with Lido (deposits + protocol buffer) 7d ago
 --Description: Dune SQL
 --Parameters: []
+/* This query calculates the amount of ETH daily deposited/withdrawn, 
+the cumulative amount of ETH deposited/withdrawn and the amount of ETH in Lido buffer for 7d ago */
 with calendar AS (
   with day_seq as(SELECT( sequence(cast('2020-11-01' as date),cast(now() as date) - interval '7' day, interval '1' day)) day )
     select days.day

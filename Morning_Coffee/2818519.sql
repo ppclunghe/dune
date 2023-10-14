@@ -1,10 +1,13 @@
 --Name: ETH net deposits 7d period, inflow leaders
 --Description: Top-10 projects by net deposits inflow
 --Parameters: []
+/* This query calculates deposits/withdrawals and growth by projects,
+and returns Top 10 projects by net deposits for the last 7d
+*/
 with 
     addresses_list as (
     
-        select address, name from query_2005642
+        select address, name from query_2005642 --ETH depositors labels
        
     )
     

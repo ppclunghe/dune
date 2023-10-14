@@ -1,6 +1,10 @@
 --Name: Lido staking APR 7days MA
 --Description: 
 --Parameters: []
+/* This query calculates the daily value of Lido protocol APR, Lido instant staking APR, 
+7-day and 30-day moving average for Lido staking APR
+*/
+
 WITH
   calendar AS (
   with day_seq as(SELECT( sequence(cast('2022-09-10' as date),cast(now() as date), interval '1' day)) day )

@@ -1,6 +1,9 @@
 --Name: Pending users withdrawals
 --Description: 
 --Parameters: []
+/* This query calculates the total amount of pending withdrawals and amount 
+of pending withdrawals after last oracle */
+
 with withdrawals_requested as (
 select  sum(cast(amountOfStETH as double))/1e18 as amount
 from lido_ethereum.WithdrawalQueueERC721_evt_WithdrawalRequested

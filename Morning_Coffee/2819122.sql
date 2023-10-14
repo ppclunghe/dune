@@ -1,10 +1,13 @@
 --Name: (w)stETH locked 1d change by protocols
 --Description: shows only protocols where delta >= 5% total (w)stETH locked in this protocol and delta >= 5k stETH
 --Parameters: []
+/* This query calculates the change of (w)stETH amount locked by protocols with 1d frequency
+where delta >= 5% total (w)stETH locked in this protocol and delta >= 5k stETH */
+
 with balances as (
-select address, namespace, balance as current_balance, 0 as d1_ago_balance from query_54574 
+select address, namespace, balance as current_balance, 0 as d1_ago_balance from query_54574 --stETH locked by protocol
 union all
-select address, namespace, 0 , balance from query_54908
+select address, namespace, 0 , balance from query_54908 --stETH locked by protocol 1d ago
 )
 
 select address, namespace, sum(current_balance) as current_balance, sum(d1_ago_balance) as d1_ago_balance,

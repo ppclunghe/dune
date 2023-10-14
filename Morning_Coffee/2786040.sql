@@ -1,11 +1,12 @@
 --Name: Lido BC net deposits 7d
 --Description: 
 --Parameters: []
+/* This query calculates the net amount of ETH deposited by Lido to BC */
 with 
     addresses_list as (
         select 
             address, name 
-        from query_2005642
+        from query_2005642 --ETH deposits labels
     )
     
 , alldeposits as (
@@ -13,14 +14,13 @@ with
         "from" as project,
         cast(value as double) as amount
     from  ethereum.traces t
-    
-    where to = 0x00000000219ab540356cbb839cbe05303d7705fa
+    where to = 0x00000000219ab540356cbb839cbe05303d7705fa --BC deposits
     AND date_trunc('day', block_time) >= now() - interval '7' day
     and call_type = 'call'
     and success = True 
 )
 
-, deposits_projects as (
+, deposits_projects as ( --deposit amounts to BC by protocol 
 select 
     coalesce(name, 'Unidentified') as name
     , sum(amount)/1e18 as amount
@@ -38,7 +38,7 @@ group by 1
     and withdrawn_principal > 0
 )
 
-, withdrawals_projects as (
+, withdrawals_projects as ( --withdrawal amounts by protocol
     select 
         project as name ,
         sum(amount) as amount

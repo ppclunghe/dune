@@ -1,6 +1,8 @@
 --Name: Current liquidity reserves by pair
 --Description: *paired tokens $ reserves in liquidity pools
 --Parameters: []
+/* This query returns the current reserves of paired tokens in USD in liquidity pools */
+
 with dates as (
     with day_seq as (select (sequence(current_date - interval '7' day, current_date, interval '1' day)) as day)
 select days.day

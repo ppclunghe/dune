@@ -1,6 +1,7 @@
 --Name: stETH:ETH rate (Curve stETH pool)
 --Description: 
 --Parameters: []
+/* This query returns the minutely stETH:ETH rate in Curve pool for the last 7 days */
 with exchanges AS (
     SELECT
       date_trunc('minute', evt_block_time) AS time,
