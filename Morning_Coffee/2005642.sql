@@ -247,6 +247,7 @@ SELECT *
         , (0x2b982DD19aF6aB6d342eB065d5fbe9F97C5872C5, 'Unknown whale 39 (from Binance)', 'Whale', 'Individual')
         , (0xeabb4d333a5b2202619842bcfb13324d0eb29fdd, 'Unknown whale 40 (from Binance)', 'Whale', 'Individual')
         , (0x4f9aa4052932947bce8105f0d0613751d152f304, 'Unknown whale 41 (from Kraken)', 'Whale', 'Individual')
+        , (0x31844dc946fb42a29e26396b31b4db04913888ed, 'Unknown whale 42', 'Whale', 'Individual') --funds withdrawn from RocketPool
         , (0x1b63142628311395ceafeea5667e7c9026c862ca, 'Taylor Gerring', 'Whale', 'Individual')
         , (0x2ed8eb76c91fa25b21d588128569dbc2f885e511, 'Linke Yang', 'Whale', 'Individual')
         , (0xf637b10647e2d0fd00c6a0b70d9e85bf6ea0327f, 'Ripio Credit Network', 'Whale', 'Individual') --depositor addres funded from multisig belonging to the p2p lending protocol - 0x16A0772b17AE004E6645E0e95BF50aD69498a34e . Doesn't seems to provide staking services to users

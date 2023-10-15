@@ -708,7 +708,7 @@
             , (0xe3bb0b5847789eb0c89772af2d265e4c5bd9ceaf, 'uniswap_v3', 'liquidity_pool', 'optimism')
             , (0x7B50775383d3D6f0215A8F290f2C9e2eEBBEceb2, 'beethoven', 'liquidity_pool', 'optimism')
             ------2023-09-01
-            , (0xba12222222228d8ba445958a75a0704d566bf2c8, 'beethoven', 'treasury', 'optimism') --vault
+            , (0xba12222222228d8ba445958a75a0704d566bf2c8, 'beethoven', 'liquidity_pool', 'optimism') --vault
             , (0x97636e06930f31c0e5f42f4e66c15fe448fbb1d2, 'gnosis_safe', 'proxy', 'optimism') ---intercated with beethoven
             , (0xB9243C495117343981EC9f8AA2ABfFEe54396Fc0, 'toros_finance', 'yield', 'optimism')
             , (0x06a0f283fa9ab931db89ab5c71fdbf166171dd35, 'gnosis_safe', 'proxy', 'optimism') --exactly?
@@ -726,7 +726,7 @@
             , (0xB1a8D1D6Dc07ca0e1E78a0004aa0bB034Fa73d60, 'mai_finance', 'lending', 'optimism')
             , (0x954aC12C339C60EAFBB32213B15af3F7c7a0dEc2, 'mai_finance', 'lending', 'optimism')
             , (0x56da1e11923b298d70dae1b4749f4cdd56a02532, 'others', 'others', 'optimism')--HorizonOP
-            , (0xf2BcDf38baA52F6b0C1Db5B025DfFf01Ae1d6dBd, 'kyberswap', 'liquidity_pool', 'optimism')
+            , (0xf2BcDf38baA52F6b0C1Db5B025DfFf01Ae1d6dBd, 'kyberswap', 'liquidity_pool', 'optimism') --elastic pool
             , (0x248213096ef0e7bf9a9049bb0508d769fcf7b8b5, 'nenofi', 'lending', 'optimism')--!!!
             , (0x794299137282e5d3af56616624ab918d1b2becf3, 'velodrome', 'liquidity_pool', 'optimism')
             , (0xb19f4d65882f6c103c332f0bc012354548e9ce0e, 'reaper_farm', 'yield', 'optimism')--!!
