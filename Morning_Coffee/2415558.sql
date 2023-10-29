@@ -1,10 +1,9 @@
 --Name: LSTs Holders
 --Description: 
 --Parameters: []
-/* This query returns list of stAssets holders addresses by name (namespace), category and blockchain
+/*
+This query returns list of stAssets holders addresses by name (namespace), category and blockchain
 */
- 
-
      SELECT * 
      FROM (
             values (0x1982b2F5814301d4e9a8b0201555376e62F82428, 'aave_v2', 'lending', 'ethereum')
@@ -399,14 +398,14 @@
             , (0x6011436690a085d35d8d90ae417cbaf3767c0fca, 'gnosis_safe', 'multisig', 'ethereum') -- lufycz.eth
             , (0x22c5cf8fc9891f8ef5a5e8630b95115018a09736, 'euler', 'lending', 'ethereum')
             , (0x9600a48ed0f931d0c422d574e3275a90d8b22745, 'instadapp', 'defi_aggr', 'ethereum')
-            , (0xfb633f47a84a1450ee0413f2c32dc1772ccaea3e, 'aragon_tresaury', 'treasury', 'ethereum')
+            , (0xfb633f47a84a1450ee0413f2c32dc1772ccaea3e, 'aragon', 'treasury', 'ethereum')
             , (0xc977CBadD359aE06b236D9581e37fd5A03E54b84, 'paragons_dao', 'treasury', 'ethereum') --ds proxy not a maker 
             , (0x9162b49919a70c3dcec6ad3bfa0feffb6d14aa5a, 'others', 'others', 'ethereum') --created by eoa.bigcoffee.eth
 		    , (0xa57b8d98dae62b26ec3bcc4a365338157060b234, 'aura', 'yield', 'ethereum')
 		    , (0x1c9798db3773d30780ff6448e015e7775c1ae75b, 'gnosis_safe', 'multisig', 'ethereum') 
 		    , (0xdafca7a5e3b67b8f36c1fdd7691ed85bbb54cc18, 'gnosis_safe', 'multisig', 'ethereum')
 		    , (0x889edc2edab5f40e902b864ad4d7ade8e412f9b1, 'lido:withdrawal_queue', 'unstaking', 'ethereum')
-		    , (0xf147b8125d2ef93fb6965db97d6746952a133934, 'yearn', 'yield', 'ethereum')
+		    , (0xf147b8125d2ef93fb6965db97d6746952a133934, 'yearn', 'yield', 'ethereum')--CurveYCRVVoter
 		    , (0xb9e66eae2b3b8e9fe201dd675f1f6f0f5aa02686, 'others', 'others', 'ethereum')
 		    , (0x9e7234576a395a6b043fe994724f3ea0d48f5524, 'gnosis_safe', 'multisig', 'ethereum')
 		    , (0x840cffa2a3a6f56eb2f205a06748a8284b683355, 'unknown15', 'unknown', 'ethereum') --created by pepes.eth
@@ -680,9 +679,19 @@
             , (0x2f08cebbd27b308cf88d2d0493b7583cd2a5da3e, 'others', 'others', 'ethereum')
             , (0x1ce8aafb51e79f6bdc0ef2ebd6fd34b00620f6db, 'diva', 'yield', 'ethereum')
             , (0x1ebfd36223079dc79fefc62260db9e25f3f5e2c7, 'strike', 'lending', 'ethereum')
-            
-            
-            
+            -----------------2023-10-23---------------------------
+            , (0x70fce97d671e81080ca3ab4cc7a59aac2e117137, 'proxy', 'multisig', 'ethereum')
+            , (0x95201b61ef19c867da0d093df20021e1a559452c, 'balancer_v2', 'gauge', 'ethereum')
+            , (0x58e6c7ab55aa9012eacca16d1ed4c15795669e1c, 'gnosis_safe', 'multisig', 'ethereum')
+            , (0x19ec471bc6b1ad25dc4bad22e7f2ab3c1397cd98, 'gnosis_safe', 'multisig', 'ethereum')
+            , (0x214e116ba3bf2c2b92b2c7a609fb38bd86e0ae36, 'summer.fi', 'lending', 'ethereum') -- !!!asteth
+            , (0x8c086e6bc71db57155843a5c74a4850ce26919c0, 'gnosis_safe', 'multisig', 'ethereum')
+            , (0xa852037a9cfc1b6b694308eade2a2e4e1a422108, 'gnosis_safe', 'multisig', 'ethereum')
+            , (0x4df59c31a3008509b3c1fee7a808c9a28f701719, 'gnosis_safe', 'multisig', 'ethereum')
+            , (0x3d7a69cdcfc07cf1f250400c46c6d959ed899134, 'argent', 'proxy', 'ethereum')
+            , (0x7ec1e82544b45a2a196c0e78c13744944f94210b, 'argent', 'proxy', 'ethereum')
+            -----------------2023-10-25---------------------------
+            , (0xca8d6a02fd2e80c606d3a1144a4f8bcd74b2eb86, 'sweth', '?yield', 'ethereum') -- super swETH, Swell DAO
             
     )x (address, namespace, category, blockchain)
     --- 2023-07-27 opti holders 
@@ -736,8 +745,10 @@
             , (0x496bf70ed3a38ba616e2670ea8b62c2140e2309f, 'others', 'others', 'optimism') --Delta Neutral Dividend
             , (0x93bd4b152d11b444a96556848830dfdbf4a0cc59, 'others', 'others', 'optimism')
             , (0x359e29a7f8b83616754b40bde1a1b90c449a686b, 'nenofi', 'lending', 'optimism')--!!!
-            
-            
+            -----------------2023-10-24---------------------------
+            , (0x7d5ba536ab244aaa1ea42ab88428847f25e3e676, 'kyberswap', 'liquidity_pool', 'optimism')
+            , (0xa5adc5484f9997fbf7d405b9aa62a7d88883c345, 'mean_finance', '?yield', 'optimism')--non-custodial DCA
+            , (0xf80e51afb613d764fa61751affd3313c190a86bb, 'others', 'others', 'optimism') -- altitude ?bridge
             
             
             
@@ -760,7 +771,7 @@
             , (0x96d75fd3047a0c960d4f6b71b1176ab6955cf99b, 'gnosis_safe', 'multisig', 'polygon')
             , (0x91bca6cbc144c2fd843534523eaa5e34686a9b19, 'gamma', 'liquidity_pool', 'polygon')--algebra pool
             , (0x0d212ad21be782a3656dda4fa74094ff454af2c7, 'uniswap_v3', 'liquidity_pool', 'polygon')
-            , (0xa5adc5484f9997fbf7d405b9aa62a7d88883c345, 'others', 'others', 'polygon')--?mean_finance
+            , (0xa5adc5484f9997fbf7d405b9aa62a7d88883c345, 'mean_finance', '?yield', 'polygon')--?mean_finance
             , (0xab08b0c9dadc343d3795dae5973925c3b6e39977, 'kyberswap', 'liquidity_pool', 'polygon')--Kyber Swap: Router
             , (0xCe4388465330a937929Ad892657640FB1805DA93, 'beefy', 'yield', 'polygon')
             , (0x370404A2A57eDfbEaF16Dc8ef8E2d1B0a2A9da15, 'gamma', 'liquidity_pool', 'polygon')--algebra pool
@@ -780,7 +791,7 @@
             , (0xe6aef2bdfd6f78332747486e498a94d120adaeb7, 'instadapp', 'defi_aggr', 'polygon')
             , (0xf2bcdf38baa52f6b0c1db5b025dfff01ae1d6dbd, 'kyberswap', 'liquidity_pool', 'polygon')
             , (0x7c0a9bae6a79a424657f06b18b4bd0ecd1022f83, 'enzyme_finance', 'defi_aggr', 'polygon') --?
-            , (0x11606d99ad8aac49e033b14c89552f585028ba7d, 'mai_finance', 'lending', 'polygon') -- VaultFeeManagerGamma 
+            , (0x11606d99ad8aac49e033b14c89552f585028ba7d, 'mai_finance', 'lending', 'polygon') -- QiDAO, VaultFeeManagerGamma 
             , (0xb2b89fc6dac21b553caa7b3e751089dc0cbd6344, 'others', 'others', 'polygon') -- --Delta Neutral Dividend
             , (0x1d8a6b7941ef1349c1b5e378783cd56b001ecfbc, 'mai_finance', 'lending', 'polygon')
             , (0xf0f5f7c21d181b7a1f9aa36ed46db3e620eda385, 'mai_finance', 'lending', 'polygon')
@@ -856,6 +867,10 @@
             , (0x5F41FfF9d70c734eB012F1A0A322980C1863aba4, 'gnosis_safe', 'multisig', 'arbitrum')
             , (0x1344a36a1b56144c3bc62e7757377d288fde0369, 'others', 'others', 'arbitrum')
             , (0x32a958d7094d04e0baaad2f768ab5c0a94b9ca6f, 'gnosis_safe', 'multisig', 'arbitrum')
+            -----2023-10-24----
+            , (0x075d3764edd5cc68193dc4a55baef3640fde7051, 'arrakis_finance', 'liquidity_pool', 'arbitrum') --small balance
+            , (0xf2bcdf38baa52f6b0c1db5b025dfff01ae1d6dbd, 'kyberswap', 'liquidity_pool', 'arbitrum')--small balance
+            , (0xa5adc5484f9997fbf7d405b9aa62a7d88883c345, 'mean_finance', '?yield', 'arbitrum')--small balance
      
      
      )x (address, namespace, category, blockchain)

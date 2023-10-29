@@ -1,18 +1,39 @@
 --Name: wstETH:stETH rate
 --Description: 
 --Parameters: []
-/* This query returns current wstETH:stETH rate*/
-
-select time, sum(steth)/sum(wsteth) AS rate
-from 
-    (
-    select date_trunc('day', call_block_time) as time, COALESCE(CAST("output_0" as DOUBLE),0) as steth, COALESCE(CAST("_wstETHAmount" as double),0) as wsteth 
-    from lido_ethereum.WstETH_call_unwrap where call_success = TRUE
-    
-    union all
-    select date_trunc('day', call_block_time) as time, COALESCE(CAST("_stETHAmount" as double),0) as steth, COALESCE(CAST("output_0" as DOUBLE),0) as wsteth 
-    from lido_ethereum.WstETH_call_wrap where "call_success" = TRUE 
-    )
-group by 1
-order by 1 desc
-limit 1
+/* 
+This query returns the current wstETH:stETH exchange rate
+ */
+-- Combines data from unwrapping and wrapping wstETH transactions, 
+-- groups the data by day and calculates the rate
+SELECT
+  time,
+  sum(steth) / sum(wsteth) AS rate
+FROM
+  (
+    -- unwrapping wstETH transactions
+    SELECT
+      date_trunc('day', call_block_time) AS time,
+      COALESCE(CAST("output_0" AS DOUBLE), 0) AS steth,
+      COALESCE(CAST("_wstETHAmount" AS DOUBLE), 0) AS wsteth
+    FROM
+      lido_ethereum.WstETH_call_unwrap
+    WHERE
+      call_success = TRUE
+    UNION all
+    -- wrapping wstETH transactions 
+    SELECT
+      date_trunc('day', call_block_time) AS time,
+      COALESCE(CAST("_stETHAmount" AS DOUBLE), 0) AS steth,
+      COALESCE(CAST("output_0" AS DOUBLE), 0) AS wsteth
+    FROM
+      lido_ethereum.WstETH_call_wrap
+    WHERE
+      "call_success" = TRUE
+  )
+GROUP BY
+  1
+ORDER BY
+  1 DESC
+LIMIT
+  1

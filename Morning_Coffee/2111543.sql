@@ -1,20 +1,25 @@
 --Name: ETH staked with Lido (deposits + protocol buffer)
 --Description: Dune SQL
 --Parameters: []
-/* This query calculates the amount of ETH daily deposited/withdrawn, 
-cumulative amount of ETH deposited/withdrawn and amount of ETH in Lido buffer */
+/* 
+This query calculates the amount of ETH daily deposited/withdrawn, 
+cumulative amount of ETH deposited/withdrawn and amount of ETH in Lido buffer
+*/
 
+-- This CTE generate a data sequence from 2020-11-01 to the current date 
 with calendar AS (
-  with day_seq as(SELECT( sequence(cast('2020-11-01' as date),cast(now() as date), interval '1' day)) day )
-    select days.day
-    from day_seq
-    cross join unnest(day) as days(day)
+-- This inner CTE generates a sequence of dates from '2020-11-01' to the current date, with a one-day interval
+  with day_seq AS (SELECT( sequence(cast('2020-11-01' AS DATE),cast(now() AS DATE), interval '1' day)) day )
+    -- selects the individual dates from the day_seq CTE
+    SELECT days.day
+    FROM day_seq
+    CROSS JOIN unnest(day) AS days(day)
 )
 
-
-, lido_deposits_daily as ( 
+ -- This CTE calculates the daily amount of ETH deposited into the Lido protocol
+, lido_deposits_daily AS ( 
     
-    SELECT date_trunc('day',block_time) as time, sum(cast(value as DOUBLE))/1e18 as lido_deposited
+    SELECT date_trunc('day',block_time) AS time, SUM(cast(value AS DOUBLE))/1e18 AS lido_deposited
     FROM  ethereum.traces
     WHERE to = 0x00000000219ab540356cbb839cbe05303d7705fa --BC deposits 
       AND call_type = 'call'
@@ -26,40 +31,42 @@ with calendar AS (
     
 )
 
-
-, lido_all_withdrawals_daily as (
-    select block_time as time, sum(amount)/1e9 as amount,
-    sum(CASE WHEN amount/1e9 BETWEEN 20 AND 32 THEN CAST(amount as double)/1e9 
+-- This CTE calculates the daily amount of ETH withdrawn from the Lido Withdrawal Vault
+, lido_all_withdrawals_daily AS (
+    SELECT block_time AS time, SUM(amount)/1e9 AS amount,
+    SUM(CASE WHEN amount/1e9 BETWEEN 20 AND 32 THEN CAST(amount AS DOUBLE)/1e9 
     WHEN amount/1e9 > 32 THEN 32 ELSE 0 END) AS withdrawn_principal
-    from ethereum.withdrawals
-    where address = 0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f --Lido Withdrawal Vault
-    group by 1
+    FROM ethereum.withdrawals
+    WHERE address = 0xB9D7934878B5FB9610B3fE8A5e441e8fad7E293f --Lido Withdrawal Vault
+    GROUP BY 1
 )
 
-, lido_principal_withdrawals_daily as (
-    select 
-    date_trunc('day',time) as time,
-    (-1) * sum(withdrawn_principal) as amount
-    from lido_all_withdrawals_daily
-    where withdrawn_principal > 0
-    group by 1
+-- This CTE calculates the daily principal amount withdrawn from the Lido Withdrawal Vault
+, lido_principal_withdrawals_daily AS (
+    SELECT 
+    date_trunc('day',time) AS time,
+    (-1) * SUM(withdrawn_principal) AS amount
+    FROM lido_all_withdrawals_daily
+    WHERE withdrawn_principal > 0
+    GROUP BY 1
  )
 
-
-, lido_buffer_amounts_daily as (
-select * from query_2481449 --Lido protocol buffer
+-- This CTE SELECTs data from 'query_2481449'(Lido protocol buffer) to get Lido protocol buffer amounts
+, lido_buffer_amounts_daily AS (
+SELECT * FROM query_2481449 
 ) 
 
+-- The final SELECT statement combines the results from the CTEs to calculate various metrics for each day
 SELECT 
     calendar.day
-    , COALESCE(lido_deposited,0) as lido_deposited_daily
-    , sum(COALESCE(lido_deposited,0)) over (order by calendar.day) as lido_deposited_cumu
-    , COALESCE(eth_balance,0) as lido_buffer
-    , COALESCE(withdrawals.amount,0) as lido_witdrawals_daily
-    , sum(COALESCE(withdrawals.amount,0)) over (order by calendar.day) as lido_withdrawals_cumu
-    , sum(COALESCE(lido_deposited,0)) over (order by calendar.day) + COALESCE(eth_balance,0) + sum(COALESCE(withdrawals.amount,0)) over (order by calendar.day) as lido_amount
-from calendar
-left join lido_deposits_daily as lido_amounts on lido_amounts.time = calendar.day
-left join lido_buffer_amounts_daily as buffer_amounts on buffer_amounts.time = calendar.day
-left join lido_principal_withdrawals_daily as withdrawals on withdrawals.time = calendar.day
-order by 1
+    , COALESCE(lido_deposited,0) AS lido_deposited_daily
+    , SUM(COALESCE(lido_deposited,0)) over (ORDER BY calendar.day) AS lido_deposited_cumu
+    , COALESCE(eth_balance,0) AS lido_buffer
+    , COALESCE(withdrawals.amount,0) AS lido_witdrawals_daily
+    , SUM(COALESCE(withdrawals.amount,0)) over (ORDER BY calendar.day) AS lido_withdrawals_cumu
+    , SUM(COALESCE(lido_deposited,0)) over (ORDER BY calendar.day) + COALESCE(eth_balance,0) + SUM(COALESCE(withdrawals.amount,0)) over (ORDER BY calendar.day) AS lido_amount
+FROM calendar
+LEFT JOIN lido_deposits_daily AS lido_amounts ON lido_amounts.time = calendar.day
+LEFT JOIN lido_buffer_amounts_daily AS buffer_amounts ON buffer_amounts.time = calendar.day
+LEFT JOIN lido_principal_withdrawals_daily AS withdrawals ON withdrawals.time = calendar.day
+ORDER BY 1
