@@ -1,142 +1,300 @@
 --Name: Locked in DeFi
 --Description: 
 --Parameters: []
-/* This query calculates:
+/* 
+This query calculates various metrics related to stETH locked in DeFi, including:
 - the total amount of stETH locked in DeFi;
-- changes of stETH amount locked in DeFi with frequences 1d/7d
-- current amount of stETH locked in Lending market/ Liquidity pool
-- changes of reserves in Lending market/ Liquidity pool with frequences 1d/7d
-*/
-
-with dates as (
-    with day_seq as (select (sequence(current_date - interval '7' day, current_date, interval '1' day)) as day)
-select days.day
-from day_seq
-cross join unnest(day) as days(day)
-)
-
-, volumes as (
-select u.call_block_time as time,  "output_0" as steth, "_wstETHAmount" as wsteth 
-from  lido_ethereum.WstETH_call_unwrap u 
-where "call_success" = TRUE 
-union all
-select u."call_block_time", "_stETHAmount" as steth, "output_0" as wsteth 
-from  lido_ethereum.WstETH_call_wrap u
-where "call_success" = TRUE 
-)
-
-
-, wsteth_rate as (
-SELECT
-  day, rate as rate0, value_partition, first_value(rate) over (partition by value_partition order by day) as rate,
-  lead(day,1,date_trunc('day', now() + interval '1' day)) over(order by day) as next_day
+- changes of stETH amount locked in DeFi over 1-day AND 7-day periods
+- current stETH locked in LENDing market AND Liquidity pool
+- changes in reserves in the LENDing market AND Liquidity pool over 1-day AND 7-day periods
+ */
+-- This CTE generates a sequence of dates for the last 7 days
+with
+  dates AS (
+    -- This inner CTE generates a sequence of days within the last 7 days with 1-day intervals
+    with
+      day_seq AS (
+        SELECT
+          (
+            sequence(
+              current_date - interval '7' day,
+              current_date,
+              interval '1' day
+            )
+          ) AS day
+      )
+      -- SELECTs the individual dates from the day_seq CTE
+    SELECT
+      days.day
+    FROM
+      day_seq
+      CROSS JOIN unnest (day) AS days (day)
+  )
+  -- This CTE retrieves data related to wrapped/unwrapped stETH transactions
+,
+  volumes AS (
+    SELECT
+      u.call_block_time AS time,
+      "output_0" AS steth,
+      "_wstETHAmount" AS wsteth
+    FROM
+      lido_ethereum.WstETH_call_unwrap u
+    WHERE
+      "call_success" = TRUE
+    UNION all
+    SELECT
+      u."call_block_time",
+      "_stETHAmount" AS steth,
+      "output_0" AS wsteth
+    FROM
+      lido_ethereum.WstETH_call_wrap u
+    WHERE
+      "call_success" = TRUE
+  )
+  -- This CTE calculates the rate of stETH to wstETH over time with 1-day intervals
+,
+  wsteth_rate AS (
+    SELECT
+      day,
+      rate AS rate0,
+      value_partition,
+      first_value(rate) over (
+        partition by
+          value_partition
+        ORDER BY
+          day
+      ) AS rate,
+      lead(
+        day,
+        1,
+        date_trunc('day', now() + interval '1' day)
+      ) over (
+        ORDER BY
+          day
+      ) AS next_day
+    FROM
+      (
+        SELECT
+          day,
+          rate,
+          SUM(
+            CASE
+              WHEN rate is NULL THEN 0
+              ELSE 1
+            END
+          ) over (
+            ORDER BY
+              day
+          ) AS value_partition
+        FROM
+          (
+            SELECT
+              date_trunc('day', d.day) AS day,
+              SUM(cast(steth AS DOUBLE)) / SUM(cast(wsteth AS DOUBLE)) AS rate
+            FROM
+              dates d
+              LEFT JOIN volumes v ON date_trunc('day', v.time) = date_trunc('day', d.day)
+            GROUP BY
+              1
+          )
+      )
+  ),
   
-FROM (
-select day, rate,
-sum(case when rate is null then 0 else 1 end) over (order by day) as value_partition
-from (
-select  date_trunc('day', d.day) as day, 
-       sum(cast(steth as double))/sum(cast(wsteth as double))  AS rate
-from dates  d
-left join volumes v on date_trunc('day', v.time)  = date_trunc('day', d.day) 
-group by 1
-))
-
-)
-
-, historical_liquidity as (
-select *, lead(time, 1, current_date + interval '1' day) over(partition by pool order by time) as next_time 
-from lido.liquidity --query_2780390
---where time >= current_date - interval '10' day  
-)
-
-, d7ago_liquiidity as (
-select sum(case when lower(main_token_symbol) = 'steth' then main_token_reserve
-    else wsteth_rate.rate*main_token_reserve
-  end) as steth_reserves
-  --l.main_token_reserve 
-from dates d
-left join historical_liquidity l on date_trunc('day', d.day) >= date_trunc('day', l.time) and date_trunc('day', d.day) < date_trunc('day', l.next_time)
-left join wsteth_rate on d.day =  wsteth_rate.day
-where d.day = current_date - interval '7' day  
-)
-
-, d1ago_liquiidity as (
-select  sum(case when lower(main_token_symbol) = 'steth' then main_token_reserve
-    else wsteth_rate.rate*main_token_reserve
-  end) as steth_reserves
-  --l.main_token_reserve 
-from dates d
-left join historical_liquidity l on date_trunc('day', d.day) >= date_trunc('day', l.time) and date_trunc('day', d.day) < date_trunc('day', l.next_time)
-left join wsteth_rate on d.day =  wsteth_rate.day
-where d.day = current_date - interval '1' day  
-)
-
-, current_liquiidity as (
-select  sum(case when lower(main_token_symbol) = 'steth' then main_token_reserve
-    else wsteth_rate.rate*main_token_reserve
-  end) as steth_reserves
-  --l.main_token_reserve 
-from dates d
-left join historical_liquidity l on date_trunc('day', d.day) >= date_trunc('day', l.time) and date_trunc('day', d.day) < date_trunc('day', l.next_time)
-left join wsteth_rate on d.day =  wsteth_rate.day
-where d.day = current_date 
-)
-, d7ago_lending as (
-select sum(amount) as steth_collateral 
-from dates d
-left join  dune.lido.result_wsteth_in_lending_pools l
---dune.lido.result_2688773 l 
-    on date_trunc('day', d.day) = date_trunc('day', l.time)
-where d.day = current_date - interval '7' day  
-)
-
-, d1ago_lending as (
-select sum(amount) as steth_collateral 
-from dates d
-left join  dune.lido.result_wsteth_in_lending_pools l
---dune.lido.result_2688773 l 
-    on date_trunc('day', d.day) = date_trunc('day', l.time)
-where d.day = current_date - interval '1' day  
-)
-
-, current_lending as (
-select sum(amount) as steth_collateral 
-from dates d
-left join dune.lido.result_wsteth_in_lending_pools l
---dune.lido.result_2688773 l 
-    on date_trunc('day', d.day) = date_trunc('day', l.time)
-where d.day = current_date
-)
-
-, all_metrics as (
-select 
-    (select steth_reserves from d7ago_liquiidity) as reserves_7d_ago,
-    (select steth_reserves from d1ago_liquiidity) as reserves_1d_ago,
-    (select steth_reserves from current_liquiidity) as reserves_current,
-    (select steth_collateral from d7ago_lending) as collateral_7d_ago,
-    (select steth_collateral from d1ago_lending) as collateral_1d_ago,
-    (select steth_collateral from current_lending) as collateral_current
-)
-
-select 
-    reserves_current,
-    reserves_7d_ago,
-    reserves_current - reserves_7d_ago as change_reserves_7d,
-    100*(reserves_current - reserves_7d_ago)/reserves_7d_ago as prc_change_reserves_7d,
-    reserves_1d_ago,
-    reserves_current - reserves_1d_ago as change_reserves_1d,
-    100*(reserves_current - reserves_1d_ago)/reserves_1d_ago as prc_change_reserves_1d,
-    collateral_current,
-    collateral_current - collateral_7d_ago as change_collateral_7d,
-    100*(collateral_current - collateral_7d_ago)/collateral_7d_ago as prc_change_collateral_7d,
-    collateral_current - collateral_1d_ago as change_collateral_1d,
-    100*(collateral_current - collateral_1d_ago)/collateral_1d_ago as prc_change_collateral_1d,
-    collateral_current + reserves_current as locked_in_defi_current,
-    (collateral_current + reserves_current - reserves_7d_ago - collateral_7d_ago) as locked_in_defi_change_7d,
-    (collateral_current + reserves_current - reserves_1d_ago - collateral_1d_ago) as locked_in_defi_change_1d,
-    format('%,.0f',round(coalesce(collateral_current + reserves_current,0),0))||' stETH / '||
-    format('%,.2f',round(coalesce( 100*(collateral_current + reserves_current - reserves_1d_ago - collateral_1d_ago) / (reserves_1d_ago + collateral_1d_ago),0),2))||'% / '||
-    format('%,.2f',round(coalesce( 100*(collateral_current + reserves_current - reserves_7d_ago - collateral_7d_ago) / (reserves_7d_ago + collateral_7d_ago),0),2))||'%'  as widget
-from all_metrics
-
+  -- This CTE calculate the amount of stETH reserves in the Lending market and Liquidity pool
+  historical_liquidity AS (
+    SELECT
+      *,
+      lead(time, 1, current_date + interval '1' day) over (
+        partition by
+          pool
+        ORDER BY
+          time
+      ) AS next_time
+    FROM
+      lido.liquidity 
+  ),
+  
+  -- This CTE calculates the stETH reserves 7 days ago in the Lending market and Liquidity pool
+  d7ago_liquiidity AS (
+    SELECT
+      SUM(
+        CASE
+          WHEN lower(main_token_symbol) = 'steth' then main_token_reserve
+          ELSE wsteth_rate.rate * main_token_reserve
+        END
+      ) AS steth_reserves
+    FROM
+      dates d
+      LEFT JOIN historical_liquidity l ON date_trunc('day', d.day) >= date_trunc('day', l.time)
+      AND date_trunc('day', d.day) < date_trunc('day', l.next_time)
+      LEFT JOIN wsteth_rate ON d.day = wsteth_rate.day
+    WHERE
+      d.day = current_date - interval '7' day
+  ),
+  
+  -- This CTE calculates the stETH reserves 1 day ago in the Lending market and Liquidity pool
+  d1ago_liquiidity AS (
+    SELECT
+      SUM(
+        CASE
+          WHEN lower(main_token_symbol) = 'steth' then main_token_reserve
+          ELSE wsteth_rate.rate * main_token_reserve
+        END
+      ) AS steth_reserves
+    FROM
+      dates d
+      LEFT JOIN historical_liquidity l ON date_trunc('day', d.day) >= date_trunc('day', l.time)
+      AND date_trunc('day', d.day) < date_trunc('day', l.next_time)
+      LEFT JOIN wsteth_rate ON d.day = wsteth_rate.day
+    WHERE
+      d.day = current_date - interval '1' day
+  ),
+  
+  -- This CTE calculates the current stETH reserves in the Lending market and Liquidity pool
+  current_liquiidity AS (
+    SELECT
+      SUM(
+        CASE
+          WHEN lower(main_token_symbol) = 'steth' then main_token_reserve
+          ELSE wsteth_rate.rate * main_token_reserve
+        END
+      ) AS steth_reserves
+    FROM
+      dates d
+      LEFT JOIN historical_liquidity l ON date_trunc('day', d.day) >= date_trunc('day', l.time)
+      AND date_trunc('day', d.day) < date_trunc('day', l.next_time)
+      LEFT JOIN wsteth_rate ON d.day = wsteth_rate.day
+    WHERE
+      d.day = current_date
+  ),
+  
+  -- This CTE calculates the stETH collateral 7 days ago in the Lending market
+  d7ago_lending AS (
+    SELECT
+      SUM(amount) AS steth_collateral
+    FROM
+      dates d
+      LEFT JOIN dune.lido.result_wsteth_in_lENDing_pools l
+      ON date_trunc('day', d.day) = date_trunc('day', l.time)
+    WHERE
+      d.day = current_date - interval '7' day
+  ),
+  
+ -- This CTE calculates the stETH collateral 1 day ago in the Lending market 
+  d1ago_lending AS (
+    SELECT
+      SUM(amount) AS steth_collateral
+    FROM
+      dates d
+      LEFT JOIN dune.lido.result_wsteth_in_lENDing_pools l
+      ON date_trunc('day', d.day) = date_trunc('day', l.time)
+    WHERE
+      d.day = current_date - interval '1' day
+  ),
+  
+  -- This CTE calculates the current stETH collateral in the Lending market.
+  current_lending AS (
+    SELECT
+      SUM(amount) AS steth_collateral
+    FROM
+      dates d
+      LEFT JOIN dune.lido.result_wsteth_in_lENDing_pools l
+      ON date_trunc('day', d.day) = date_trunc('day', l.time)
+    WHERE
+      d.day = current_date
+  ),
+  
+ -- This CTE gathers all the calculated metrics into one table. 
+  all_metrics AS (
+    SELECT
+      (
+        SELECT
+          steth_reserves
+        FROM
+          d7ago_liquiidity
+      ) AS reserves_7d_ago,
+      (
+        SELECT
+          steth_reserves
+        FROM
+          d1ago_liquiidity
+      ) AS reserves_1d_ago,
+      (
+        SELECT
+          steth_reserves
+        FROM
+          current_liquiidity
+      ) AS reserves_current,
+      (
+        SELECT
+          steth_collateral
+        FROM
+          d7ago_lending
+      ) AS collateral_7d_ago,
+      (
+        SELECT
+          steth_collateral
+        FROM
+          d1ago_lending
+      ) AS collateral_1d_ago,
+      (
+        SELECT
+          steth_collateral
+        FROM
+          current_lending
+      ) AS collateral_current
+  )
+  
+-- final SELECT statement computes daily and weekly changes in reserves and collateral, 
+-- the total stETH locked in DeFi, and their daily and weekly changes  
+SELECT
+  reserves_current,
+  reserves_7d_ago,
+  reserves_current - reserves_7d_ago AS change_reserves_7d,
+  100 * (reserves_current - reserves_7d_ago) / reserves_7d_ago AS prc_change_reserves_7d,
+  reserves_1d_ago,
+  reserves_current - reserves_1d_ago AS change_reserves_1d,
+  100 * (reserves_current - reserves_1d_ago) / reserves_1d_ago AS prc_change_reserves_1d,
+  collateral_current,
+  collateral_current - collateral_7d_ago AS change_collateral_7d,
+  100 * (collateral_current - collateral_7d_ago) / collateral_7d_ago AS prc_change_collateral_7d,
+  collateral_current - collateral_1d_ago AS change_collateral_1d,
+  100 * (collateral_current - collateral_1d_ago) / collateral_1d_ago AS prc_change_collateral_1d,
+  collateral_current + reserves_current AS locked_in_defi_current,
+  (
+    collateral_current + reserves_current - reserves_7d_ago - collateral_7d_ago
+  ) AS locked_in_defi_change_7d,
+  (
+    collateral_current + reserves_current - reserves_1d_ago - collateral_1d_ago
+  ) AS locked_in_defi_change_1d,
+  format(
+    '%,.0f',
+    round(
+      coalesce(collateral_current + reserves_current, 0),
+      0
+    )
+  ) || ' stETH / ' || format(
+    '%,.2f',
+    round(
+      coalesce(
+        100 * (
+          collateral_current + reserves_current - reserves_1d_ago - collateral_1d_ago
+        ) / (reserves_1d_ago + collateral_1d_ago),
+        0
+      ),
+      2
+    )
+  ) || '% / ' || format(
+    '%,.2f',
+    round(
+      coalesce(
+        100 * (
+          collateral_current + reserves_current - reserves_7d_ago - collateral_7d_ago
+        ) / (reserves_7d_ago + collateral_7d_ago),
+        0
+      ),
+      2
+    )
+  ) || '%' AS widget
+FROM
+  all_metrics
