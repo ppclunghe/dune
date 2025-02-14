@@ -1,0 +1,37 @@
+name: Fetch Dune SQL Queries
+
+on:
+  schedule:
+    - cron: '0 * * * *' # '0 0 1 * *'  # Runs on the 1st day of every month at midnight UTC
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  fetch-dune-sql:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4  # Pulls the latest repo state
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt  # If you have dependencies
+          pip install jupyter nbconvert  # If using a notebook
+
+      - name: Run Python Script
+        run: python your_notebook.py  # Execute your script
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions@github.com"
+          git add .
+          git commit -m "Auto-update Dune SQL queries"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Uses GitHub’s built-in token
