@@ -22,7 +22,7 @@ jobs:
           
       - name: Debug Authentication
         run: |
-          git remote -v
+          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/ppclunghe/dune.git
           curl -H "Authorization: token ${{ secrets.GH_PAT }}" https://api.github.com/user
         env:
           GH_PAT: ${{ secrets.GH_PAT }}    
@@ -40,6 +40,9 @@ jobs:
         
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Create .env file with Dune API Key
+        run: echo "DUNE_API_KEY=${{ secrets.DUNE_API_KEY }}" > .env
         
       - name: Commit and Push Changes
         run: |
