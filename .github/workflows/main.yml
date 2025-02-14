@@ -2,7 +2,7 @@ name: Fetch Dune SQL Queries
 
 on:
   schedule:
-    - cron: '0 * * * *' # '0 0 1 * *'  # Runs on the 1st day of every month at midnight UTC
+    - cron: '0 * * * *'  # Runs every hour
   workflow_dispatch:  # Allows manual trigger
 
 jobs:
@@ -13,48 +13,37 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_PAT }}  # Use PAT instead of GITHUB_TOKEN
+          token: ${{ secrets.GH_PAT }}  # Uses PAT to allow pushing changes
 
-      - name: Debug GH_PAT
-        run: echo "GH_PAT is set"
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-          
-      - name: Debug Authentication
-        run: |
-          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/ppclunghe/dune.git
-          git remote -v
-          curl -H "Authorization: token ${{ secrets.GH_PAT }}" https://api.github.com/user
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}    
-          
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
       - name: Install Dependencies
         run: |
-          pip install -r requirements.txt  # If you have dependencies
-          pip install jupyter nbconvert  # If using a notebook
-          
+          pip install -r requirements.txt
+          pip install jupyter nbconvert
+
       - name: Convert Notebook to Python
         run: jupyter nbconvert --to script queries_backup.ipynb
         
       - name: Run Python Script
-        run: python queries_backup.py  # Execute your script
-        
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+        run: python queries_backup.py
 
-      - name: Create .env file with Dune API Key
-        run: echo "DUNE_API_KEY=${{ secrets.DUNE_API_KEY }}" > .env
-        
-      - name: Commit and Push Changes
+      - name: Commit and Push Changes to a New Branch
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
-          git fetch origin initial-backup-MC
-          git checkout initial-backup-MC
+          git checkout -b update-dune-queries  # Create a new branch
           git add .
           git commit -m "Auto-update Dune SQL queries" || echo "No changes to commit"
-          git push https://${{ secrets.GH_PAT }}@github.com/ppclunghe/dune.git HEAD:main
-          
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+          git push origin update-dune-queries  # Push to new branch
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GH_PAT }}
+          branch: update-dune-queries
+          title: "Auto-update Dune SQL queries"
+          body: "Automated update of queries."
