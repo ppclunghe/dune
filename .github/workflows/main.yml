@@ -47,12 +47,13 @@ jobs:
         
       - name: Commit and Push Changes
         run: |
-          git config --global user.name "ppclunghe"  # Set your GitHub username
-          git config --global user.email "pipistrella@list.ru"  # Use your GitHub email
-          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/ppclunghe/dune.git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions@github.com"
+          git fetch origin main
+          git checkout main
           git add .
           git commit -m "Auto-update Dune SQL queries" || echo "No changes to commit"
-          git push origin initial-backup-MC
+          git push origin main
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
