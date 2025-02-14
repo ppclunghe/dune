@@ -13,7 +13,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_PAT }}  # Uses PAT to allow pushing changes
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0  # Ensure we fetch all branches
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -35,15 +36,19 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
-          git checkout -b update-dune-queries  # Create a new branch
+          git checkout main  # Ensure we're on the main branch
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          BRANCH_NAME="update-dune-queries-${TIMESTAMP}"
+          git checkout -b $BRANCH_NAME  # Create a unique new branch
           git add .
           git commit -m "Auto-update Dune SQL queries" || echo "No changes to commit"
-          git push origin update-dune-queries  # Push to new branch
+          git push origin $BRANCH_NAME  # Push new branch
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GH_PAT }}
-          branch: update-dune-queries
+          branch: ${{ steps.commit-push.outputs.BRANCH_NAME }}  # Use the dynamically created branch
+          base: main
           title: "Auto-update Dune SQL queries"
           body: "Automated update of queries."
