@@ -12,11 +12,18 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4  # Pulls the latest repo state
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          token: ${{ secrets.GH_PAT }}  # Use PAT instead of default GITHUB_TOKEN
+          
+      - name: Check Git User & Repo Access
+        run: |
+          git config --list
+          git remote -v
+          curl -H "Authorization: token ${{ secrets.GH_PAT }}" https://api.github.com/user
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                python-version: '3.10'
 
       - name: Install Dependencies
         run: |
@@ -28,7 +35,11 @@ jobs:
         
       - name: Run Python Script
         run: python queries_backup.py  # Execute your script
-
+        
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+    
       - name: Commit and Push Changes
         run: |
           git config --global user.name "github-actions[bot]"
