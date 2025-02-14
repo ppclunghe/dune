@@ -49,11 +49,11 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
-          git fetch origin main
-          git checkout main
+          git fetch origin initial-backup-MC
+          git checkout initial-backup-MC
           git add .
           git commit -m "Auto-update Dune SQL queries" || echo "No changes to commit"
-          git push origin main
+          git push origin initial-backup-MC
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
