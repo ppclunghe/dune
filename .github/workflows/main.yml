@@ -22,9 +22,12 @@ jobs:
         run: |
           pip install -r requirements.txt  # If you have dependencies
           pip install jupyter nbconvert  # If using a notebook
-
+          
+      - name: Convert Notebook to Python
+        run: jupyter nbconvert --to script queries_backup.ipynb
+        
       - name: Run Python Script
-        run: python your_notebook.py  # Execute your script
+        run: python queries_backup.py  # Execute your script
 
       - name: Commit and Push Changes
         run: |
