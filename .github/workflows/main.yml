@@ -57,8 +57,10 @@ jobs:
       
           git checkout -b $BRANCH_NAME
       
-          # Add and check for changes before committing
+          # Add changes
           git add .
+          
+          # Check if there are actual changes
           if git diff --cached --quiet; then
             echo "No changes detected. Skipping PR creation."
             exit 0  # Stop workflow if no changes
