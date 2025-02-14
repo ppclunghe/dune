@@ -14,17 +14,12 @@ jobs:
         uses: actions/checkout@v4  # Pulls the latest repo state
         with:
           token: ${{ secrets.GH_PAT }}  # Use PAT instead of default GITHUB_TOKEN
-          
-      - name: Check Git User & Repo Access
-        run: |
-          git config --list
-          git remote -v
-          curl -H "Authorization: token ${{ secrets.GH_PAT }}" https://api.github.com/user
-            - name: Set up Python
-              uses: actions/setup-python@v4
-              with:
-                python-version: '3.10'
 
+      - name: Debug GH_PAT
+        run: echo "GH_PAT is set"
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+          
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt  # If you have dependencies
@@ -39,13 +34,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         
-    
       - name: Commit and Push Changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/ppclunghe/dune.git
           git add .
           git commit -m "Auto-update Dune SQL queries" || echo "No changes to commit"
-          git push origin initial-backup-MC
+          git push origin $(git rev-parse --abbrev-ref HEAD)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Uses GitHub’s built-in token
+          GH_PAT: ${{ secrets.GH_PAT }}
+      
