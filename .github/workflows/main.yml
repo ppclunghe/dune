@@ -53,7 +53,8 @@ jobs:
           git checkout initial-backup-MC
           git add .
           git commit -m "Auto-update Dune SQL queries" || echo "No changes to commit"
-          git push origin initial-backup-MC
+          git push https://${{ secrets.GH_PAT }}@github.com/ppclunghe/dune.git HEAD:main
+          
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
