@@ -77,17 +77,28 @@ jobs:
           base: ${{ env.DEFAULT_BRANCH }}
           title: "Auto-update Dune SQL queries"
           body: "Automated update of queries."
-          delete-branch: true  # Auto-delete branch after merge
+          delete-branch: false  # Auto-delete branch after merge
+          always-create-pr: true  # Ensures a PR is made even if minor changes are detected
 
       - name: Auto-Merge PR (Optional)
         if: success()
         run: |
           PR_URL=$(gh pr list --base ${{ env.DEFAULT_BRANCH }} --head ${{ env.BRANCH_NAME }} --json url --jq '.[0].url')
-          if [ -n "$PR_URL" ]; then
+          if [ -n "$PR_URL" ] && [ "$PR_URL" != "null" ]; then
             gh pr merge --auto --squash "$PR_URL"
             echo "Pull request merged: $PR_URL"
           else
             echo "No open pull request found for auto-merge."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+
+      - name: Delete Branch After Merge
+        if: success()
+        run: |
+          if gh pr view ${{ env.BRANCH_NAME }} --json merged --jq '.merged'; then
+            git push origin --delete ${{ env.BRANCH_NAME }}
+            echo "Branch deleted: ${{ env.BRANCH_NAME }}"
           fi
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
