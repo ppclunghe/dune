@@ -23,8 +23,8 @@ jobs:
         id: detect-branch
         run: |
           DEFAULT_BRANCH=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
-          echo "Default branch is: $DEFAULT_BRANCH"
           echo "DEFAULT_BRANCH=$DEFAULT_BRANCH" >> $GITHUB_ENV
+          echo "Default branch detected: $DEFAULT_BRANCH"
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -38,7 +38,7 @@ jobs:
 
       - name: Convert Notebook to Python
         run: jupyter nbconvert --to script queries_backup.ipynb
-        
+
       - name: Run Python Script
         run: python queries_backup.py
 
@@ -46,13 +46,15 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
-          
-          # Checkout the detected default branch
+
+          # Checkout the default branch
           git checkout ${{ env.DEFAULT_BRANCH }}
 
           # Create a unique branch name
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           BRANCH_NAME="update-dune-queries-${TIMESTAMP}"
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV  # Store branch name for later steps
+
           git checkout -b $BRANCH_NAME
 
           git add .
@@ -63,7 +65,7 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GH_PAT }}
-          branch: ${{ env.BRANCH_NAME }}
+          branch: ${{ env.BRANCH_NAME }}  # Now using the stored branch name
           base: ${{ env.DEFAULT_BRANCH }}
           title: "Auto-update Dune SQL queries"
           body: "Automated update of queries."
