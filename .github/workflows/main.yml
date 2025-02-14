@@ -19,11 +19,14 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
+      
+      - name: Convert Notebook to Python
+        run: jupyter nbconvert --to script queries_backup.ipynb
+   
+        
       - name: Update Queries
         run: |
-          # Run your script to update queries here
-          ./update_queries.sh  # Replace with your actual update command
+          python queries_backup.py
           git add .
           if git diff --cached --quiet; then
             echo "No changes detected. Exiting..."
