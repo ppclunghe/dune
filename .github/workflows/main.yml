@@ -2,7 +2,7 @@ name: Fetch Dune SQL Queries
 
 on:
   schedule:
-    - cron: '0 0 1 * *'  # Runs every hour
+    - cron: '0 0 1 * *'  # Runs on the 1st of every month at midnight UTC
   workflow_dispatch:  # Allows manual trigger
 
 jobs:
@@ -16,19 +16,18 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           fetch-depth: 0  # Fetch all history to access all branches
 
-      - name: Debug Available Branches
-        run: git branch -r  # List all remote branches for debugging
-
       - name: Detect Default Branch
         id: detect-branch
         run: |
           DEFAULT_BRANCH=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
           echo "DEFAULT_BRANCH=$DEFAULT_BRANCH" >> $GITHUB_ENV
           echo "Default branch detected: $DEFAULT_BRANCH"
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+
       - name: Create .env file with Dune API Key
         run: echo "DUNE_API_KEY=${{ secrets.DUNE_API_KEY }}" > .env
         
@@ -36,6 +35,7 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install jupyter nbconvert
+
       - name: Convert Notebook to Python
         run: jupyter nbconvert --to script queries_backup.ipynb
 
@@ -46,21 +46,46 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
+
           # Checkout the default branch
           git checkout ${{ env.DEFAULT_BRANCH }}
+
           # Create a unique branch name
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           BRANCH_NAME="update-dune-queries-${TIMESTAMP}"
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV  # Store branch name for later steps
+
           git checkout -b $BRANCH_NAME
+
+          # Add and commit changes if there are any
           git add .
-          git commit -m "Auto-update Dune SQL queries" || echo "No changes to commit"
+          if git diff --cached --quiet; then
+            echo "No changes detected. Exiting..."
+            exit 0  # Stop the workflow if no changes
+          fi
+          
+          git commit -m "Auto-update Dune SQL queries"
           git push origin $BRANCH_NAME  # Push new branch
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GH_PAT }}
-          branch: ${{ env.BRANCH_NAME }}  # Now using the stored branch name
+          branch: ${{ env.BRANCH_NAME }}
           base: ${{ env.DEFAULT_BRANCH }}
           title: "Auto-update Dune SQL queries"
           body: "Automated update of queries."
+          delete-branch: true  # Auto-delete branch after merge
+
+      - name: Auto-Merge PR (Optional)
+        if: success()
+        run: |
+          PR_URL=$(gh pr list --base ${{ env.DEFAULT_BRANCH }} --head ${{ env.BRANCH_NAME }} --json url --jq '.[0].url')
+          if [ -n "$PR_URL" ]; then
+            gh pr merge --auto --squash "$PR_URL"
+            echo "Pull request merged: $PR_URL"
+          else
+            echo "No open pull request found for auto-merge."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
