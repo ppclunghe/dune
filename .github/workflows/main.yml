@@ -41,32 +41,32 @@ jobs:
 
       - name: Run Python Script
         run: python queries_backup.py
-
+     
       - name: Commit and Push Changes to a New Branch
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
-
+      
           # Checkout the default branch
           git checkout ${{ env.DEFAULT_BRANCH }}
-
+      
           # Create a unique branch name
           TIMESTAMP=$(date +%Y%m%d%H%M%S)
           BRANCH_NAME="update-dune-queries-${TIMESTAMP}"
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV  # Store branch name for later steps
-
+      
           git checkout -b $BRANCH_NAME
-
-          # Add and commit changes if there are any
+      
+          # Add and check for changes before committing
           git add .
           if git diff --cached --quiet; then
-            echo "No changes detected. Exiting..."
-            exit 0  # Stop the workflow if no changes
+            echo "No changes detected. Skipping PR creation."
+            exit 0  # Stop workflow if no changes
           fi
           
           git commit -m "Auto-update Dune SQL queries"
           git push origin $BRANCH_NAME  # Push new branch
-
+     
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
